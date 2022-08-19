@@ -1,5 +1,5 @@
 // test/BadgeToken-test.js
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 
 describe("EtherFrens Contract", function () {
   let EtherFrens721Contract;
@@ -23,7 +23,6 @@ describe("EtherFrens Contract", function () {
    [owner, account1, ...otheraccounts] = await ethers.getSigners();
 
     token721 = await EtherFrens721Contract.deploy(THREE_PERCENT_BIPS);
-    // provider = ethers.getDefaultProvider();
   });
 
   describe("Deployment Tests", function () {
@@ -41,11 +40,15 @@ describe("EtherFrens Contract", function () {
 
   describe("Ownership Tests", function () {
     // onlyOwner methods
-    // it("Owner can call setbaseUri()", async function () {
-    //   expect(await token721.setBaseURI({from: owner})).to.not.be.reverted;
-    //   expect(await token721.setBaseURI({from: account1})).reverted;
-    // });
-
+    it("Testowner can call mint()", async function () {
+      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+    });
+    it("Test guest should not call mint()", async function () {
+      await expect(token721
+        .connect(account1)
+        .mint(account1.address, TEST_URI1))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
     // it("Owner can call mint()", async function () {
     //   expect(await token721.mint({from: owner})).to.not.be.reverted;
     //   expect(await token721.mint({from: account1})).reverted;

@@ -26,7 +26,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
-.env*.local
+# .env*.local
 
 # vercel
 .vercel
@@ -36,7 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 node_modules
-.env
+# .env
 coverage
 coverage.json
 typechain
@@ -45,18 +45,3 @@ typechain-types
 #Hardhat files
 cache
 artifacts
-
-
-node_modules
-.env
-coverage
-coverage.json
-typechain
-typechain-types
-
-#Hardhat files
-cache
-artifacts
-
-# private key
-.secret

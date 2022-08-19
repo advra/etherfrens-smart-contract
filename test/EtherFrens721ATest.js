@@ -110,14 +110,14 @@ describe("EtherFrens Contract", function () {
     // setTokenRoyalty
     it("Testowner can call setTokenRoyalty()", async function () {
       expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
-      expect(await token721.setTokenRoyalty(owner.address, SIX_PERCENT_BIPS)).to.not.be.reverted;
+      expect(await token721.setTokenRoyalty(1, owner.address, SIX_PERCENT_BIPS)).to.not.be.reverted;
     });
 
     it("Test guest should not call setTokenRoyalty()", async function () {
       expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
       await expect(token721
         .connect(account1)
-        .setTokenRoyalty(owner.address, SIX_PERCENT_BIPS))
+        .setTokenRoyalty(1, owner.address, SIX_PERCENT_BIPS))
         .to.be.revertedWith("Ownable: caller is not the owner");
     });
   });

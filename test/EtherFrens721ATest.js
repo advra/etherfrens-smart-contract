@@ -66,6 +66,8 @@ describe("EtherFrens Contract", function () {
       const address1=account1.address;
       await token721.mint(address1, TEST_URI1);
       expect(await token721.ownerOf(1)).to.equal(address1);    
+      expect(await token721.tokenURI(1)).to.equal(TEST_URI1);
+      expect(await token721.totalSupply()).to.equal(1); 
     });
 
     // TODO: Passes but has gas estimation error issue
@@ -84,7 +86,8 @@ describe("EtherFrens Contract", function () {
       await token721.mint(address1, TEST_URI2);
       expect(await token721.ownerOf(2)).to.equal(address1);
       expect(await token721.tokenURI(2)).to.equal(TEST_URI2);
-      expect(await token721.balanceOf(address1)).to.equal(2);      
+      expect(await token721.balanceOf(address1)).to.equal(2);   
+      expect(await token721.totalSupply()).to.equal(2);    
     });
 
     it("Test multiMint 1-5 from owner to address1 results in 5 total", async function () {
@@ -101,6 +104,7 @@ describe("EtherFrens Contract", function () {
       expect(await token721.tokenURI(3)).to.equal(TEST_URI3);
       expect(await token721.balanceOf(address1)).to.equal(3);      
       expect(await token721.totalSupply()).to.equal(3);  
+      expect(await token721.totalSupply()).to.equal(3); 
     });
   });
 
@@ -126,6 +130,7 @@ describe("EtherFrens Contract", function () {
       // set new URI then check with base    
       await token721.setBaseURI(TEST_BASE1);
       expect(await token721.tokenURI(3)).to.equal(TEST_BASE1 + TEST_URI3); 
+      expect(await token721.totalSupply()).to.equal(3); 
     });
 
     
@@ -141,6 +146,7 @@ describe("EtherFrens Contract", function () {
       
       // first check will have no base
       expect(await token721.tokenURI(3)).to.equal(TEST_URI3);  
+      expect(await token721.totalSupply()).to.equal(3); 
     });
 
     
@@ -183,7 +189,8 @@ describe("EtherFrens Contract", function () {
         expect(await token721.tokenURI(2)).to.equal(TEST_BASE1 + TEST_URI2);  
         expect(await token721.ownerOf(3)).to.equal(address1);
         expect(await token721.tokenURI(3)).to.equal(TEST_BASE1 + TEST_URI3); 
-        
+        expect(await token721.totalSupply()).to.equal(3); 
+
         // change to base2 then recheck
         token721.setBaseURI(TEST_BASE2);
         expect(await token721.ownerOf(1)).to.equal(address1);
@@ -192,6 +199,7 @@ describe("EtherFrens Contract", function () {
         expect(await token721.tokenURI(2)).to.equal(TEST_BASE2 + TEST_URI2);  
         expect(await token721.ownerOf(3)).to.equal(address1);
         expect(await token721.tokenURI(3)).to.equal(TEST_BASE2 + TEST_URI3); 
+        expect(await token721.totalSupply()).to.equal(3); 
       });
   });
 

@@ -56,7 +56,6 @@ contract EtherFrensNFT is ERC721A, Ownable, ERC2981 {
     }
 
     function setTokenURI(uint256 tokenId, string memory _tokenURI) public virtual onlyOwner {
-        console.log("setTokenURI %d %s", tokenId, string(_tokenURI));
         require(_exists(tokenId), "Cant set URI of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }

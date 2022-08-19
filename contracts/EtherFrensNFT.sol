@@ -64,11 +64,11 @@ contract EtherFrensNFT is ERC721A, Ownable, ERC2981 {
         assert(address(this).balance == 0);
     }
 
-    function setDefaultRoyalty(address receiver, uint96 feeNumerator) public onlyOwner {
+    function setDefaultRoyalty(address receiver, uint96 feeNumerator) public virtual onlyOwner {
         _setDefaultRoyalty(receiver, feeNumerator);
     }
 
-    function setTokenRoyalty( uint256 tokenId, address receiver, uint96 feeNumerator) public onlyOwner {
+    function setTokenRoyalty( uint256 tokenId, address receiver, uint96 feeNumerator) public virtual onlyOwner {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 

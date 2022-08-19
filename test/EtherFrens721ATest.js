@@ -7,6 +7,8 @@ describe("EtherFrens Contract", function () {
   let _contractName='EtherFrens';
   let _contractSymbol='EF';
   let THREE_PERCENT_BIPS = 300;
+  let ONE_PERCENT_BIPS = 100;
+  let SIX_PERCENT_BIPS = 600;
   let account1,otheraccounts;
   let provider; //networkprovider
 
@@ -39,31 +41,85 @@ describe("EtherFrens Contract", function () {
   });
 
   describe("Ownership Tests", function () {
-    // onlyOwner methods
+
+    // mint
     it("Testowner can call mint()", async function () {
       expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
     });
+
     it("Test guest should not call mint()", async function () {
       await expect(token721
         .connect(account1)
         .mint(account1.address, TEST_URI1))
         .to.be.revertedWith("Ownable: caller is not the owner");
     });
-    // it("Owner can call mint()", async function () {
-    //   expect(await token721.mint({from: owner})).to.not.be.reverted;
-    //   expect(await token721.mint({from: account1})).reverted;
-    // });
 
-    // it("Owner can call _setTokenURI()", async function () {
-    //   expect(await token721._setTokenURI({from: owner})).to.not.be.reverted;
-    //   expect(await token721._setTokenURI({from: account1})).reverted;
-    // });
+    // mintMulti
+    it("Testowner can call mintMulti()", async function () {
+      expect(await token721.mintMulti(account1.address, [TEST_URI1, TEST_URI2, TEST_URI3])).to.not.be.reverted;
+    });
 
-    
-    // it("Owner can call withdrawFunds()", async function () {
-    //   expect(await token721.withdrawFunds({from: owner})).to.not.be.reverted;
-    //   expect(await token721.withdrawFunds({from: account1})).reverted;
-    // });
+    it("Test guest should not call mintMulti()", async function () {
+      await expect(token721
+        .connect(account1)
+        .mintMulti(account1.address, [TEST_URI1, TEST_URI2, TEST_URI3]))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    // setBaseURI
+    it("Testowner can call setBaseURI()", async function () {
+      expect(await token721.setBaseURI(TEST_URI2)).to.not.be.reverted;
+    });
+
+    it("Test guest should not call setBaseURI()", async function () {
+      await expect(token721
+        .connect(account1)
+        .setBaseURI(TEST_URI1))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    // setTokenURI
+    it("Testowner can call setTokenURI()", async function () {
+      // must mint so we have valid URI to try to set
+      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.setTokenURI(1, TEST_URI2)).to.not.be.reverted;
+    });
+
+    it("Test guest should not call setTokenURI()", async function () {
+      // must mint so we have valid URI to try to set
+      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      await expect(token721
+        .connect(account1)
+        .setTokenURI(1,TEST_URI2))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    // withdraw TODO
+
+    // setDefaultRoyalty
+      it("Testowner can call setDefaultRoyalty()", async function () {
+        expect(await token721.setDefaultRoyalty(owner.address, SIX_PERCENT_BIPS)).to.not.be.reverted;
+      });
+  
+      it("Test guest should not call setDefaultRoyalty()", async function () {
+        await expect(token721
+          .connect(account1)
+          .setDefaultRoyalty(owner.address, SIX_PERCENT_BIPS))
+          .to.be.revertedWith("Ownable: caller is not the owner");
+      });
+
+    // setTokenRoyalty
+    it("Testowner can call setTokenRoyalty()", async function () {
+      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.setTokenRoyalty(owner.address, SIX_PERCENT_BIPS)).to.not.be.reverted;
+    });
+
+    it("Test guest should not call setTokenRoyalty()", async function () {
+      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      await expect(token721
+        .connect(account1)
+        .setTokenRoyalty(owner.address, SIX_PERCENT_BIPS))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 
   describe("Minting Tests", function () {
@@ -218,8 +274,6 @@ describe("EtherFrens Contract", function () {
 
     it("Test changing royalty for specific token", async function () {
       const BASE_FEE_DENOMINATOR = 10000;
-      const ONE_PERCENT_BIPS = 100;
-      const SIX_PERCENT_BIPS = 600;
       // change entire collection toi 1 percent 
       await token721.setDefaultRoyalty(owner.address, ONE_PERCENT_BIPS);
       const result1 = await token721.royaltyInfo(59, BASE_FEE_DENOMINATOR);

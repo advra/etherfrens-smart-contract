@@ -6,6 +6,7 @@ describe("EtherFrens Contract", function () {
   let token721;
   let _contractName='EtherFrens';
   let _contractSymbol='EF';
+  let THREE_PERCENT_BIPS = 300;
   let account1,otheraccounts;
   let provider; //networkprovider
 
@@ -16,11 +17,12 @@ describe("EtherFrens Contract", function () {
   let TEST_URI3 = "tokenurifor3";
   let TEST_URI_NONTEXISTENT = "tokenurifor10";
 
+
   beforeEach(async function () {
     EtherFrens721Contract = await ethers.getContractFactory("EtherFrensNFT");
    [owner, account1, ...otheraccounts] = await ethers.getSigners();
 
-    token721 = await EtherFrens721Contract.deploy();
+    token721 = await EtherFrens721Contract.deploy(THREE_PERCENT_BIPS);
     // provider = ethers.getDefaultProvider();
   });
 
@@ -201,6 +203,38 @@ describe("EtherFrens Contract", function () {
         expect(await token721.tokenURI(3)).to.equal(TEST_BASE2 + TEST_URI3); 
         expect(await token721.totalSupply()).to.equal(3); 
       });
+  });
+
+  describe("Royalty tests", function () {
+    it("Check royalty deployment value", async function () {
+      const BASE_FEE_DENOMINATOR = 10000;
+      const result = await token721.royaltyInfo(1, BASE_FEE_DENOMINATOR);
+      expect(result[0]).to.equal(owner.address);
+      expect(result[1]).to.equal(THREE_PERCENT_BIPS);
+    });
+
+    it("Test changing royalty for specific token", async function () {
+      const BASE_FEE_DENOMINATOR = 10000;
+      const ONE_PERCENT_BIPS = 100;
+      const SIX_PERCENT_BIPS = 600;
+      // change entire collection toi 1 percent 
+      await token721.setDefaultRoyalty(owner.address, ONE_PERCENT_BIPS);
+      const result1 = await token721.royaltyInfo(59, BASE_FEE_DENOMINATOR);
+      expect(result1[0]).to.equal(owner.address);
+      expect(result1[1]).to.equal(ONE_PERCENT_BIPS);
+      const result2 = await token721.royaltyInfo(5, BASE_FEE_DENOMINATOR);
+      expect(result2[0]).to.equal(owner.address);
+      expect(result2[1]).to.equal(ONE_PERCENT_BIPS);
+
+      // change token #5 to 6% where as all others remain the same
+      await token721.setTokenRoyalty(5, owner.address, SIX_PERCENT_BIPS);
+      const result3 = await token721.royaltyInfo(59, BASE_FEE_DENOMINATOR);
+      expect(result3[0]).to.equal(owner.address);
+      expect(result3[1]).to.equal(ONE_PERCENT_BIPS);
+      const result4 = await token721.royaltyInfo(5, BASE_FEE_DENOMINATOR);
+      expect(result4[0]).to.equal(owner.address);
+      expect(result4[1]).to.equal(SIX_PERCENT_BIPS);
+    });
   });
 
   // describe("Withdrawal", function () {

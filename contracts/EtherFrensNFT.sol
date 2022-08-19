@@ -6,12 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "erc721a/contracts/ERC721A.sol";
-import "hardhat/console.sol";
 
 contract EtherFrensNFT is ERC721A, Ownable, ERC2981 {
     using Strings for uint256;
-
-    uint96 royaltyFeesInBips;
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721A, ERC2981) returns (bool) {
     // Supports the following `interfaceId`s:
@@ -42,11 +39,6 @@ contract EtherFrensNFT is ERC721A, Ownable, ERC2981 {
     function mintMulti(address _to, string[] memory newTokenURIs) public onlyOwner 
     {
         uint256 quantity = newTokenURIs.length;
-        console.log(
-            "mintMulti to %s %s tokens",
-            _to,
-            quantity
-        );
         require(quantity > 1, "Quantity is 1");
         _safeMint(_to, quantity);
         uint256 startingMintIndex = _nextTokenId() - quantity;  

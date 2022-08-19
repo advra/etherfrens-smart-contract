@@ -1,10 +1,17 @@
 // require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-chai-matchers");
+require("@nomiclabs/hardhat-etherscan");
+require('dotenv').config();
 
 const fs = require("fs");
-const privateKey = fs.readFileSync(".secret").toString();
-const projectId = "26gjZfz5yjOLi5qyALXITtFDsngVQUw9";
+const privateKey = process.env.WALLET_PRIVATE_KEY;
+const POL = process.env.PROJECT_ID;
+const ALCHEMY_ID_ETH_MAINNET = process.env.ALCHEMY_ID_ETH_MAINNET;
+const ALCHEMY_ID_ETH_GORELI = process.env.ALCHEMY_ID_ETH_GORELI;
+const ALCHEMY_POLYGON_MAINNET = process.env.ALCHEMY_POLYGON_MAINNET;
+const ALCHEMY_POLYGON_MUMBAI = process.env.ALCHEMY_POLYGON_MUMBAI;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -17,17 +24,25 @@ module.exports = {
       chainId: 31337,
       allowUnlimitedContractSize: true
     },
-    polygonmumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${projectId}`,
-      accounts: [privateKey],
-      gas: 2100000,
-      gasPrice: 8000000000
+    ethmainnet: {
+      url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID_ETH_MAINNET}`,
+      accounts: [privateKey]
+    },
+    ethgoreli: {
+      url: `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_ID_ETH_GORELI}`,
+      accounts: [privateKey]
     },
     polygonmainnet: {
-      url: `https://polygon-mainnet.g.alchemy.com/v2/${projectId}`,
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_POLYGON_MAINNET}`,
       accounts: [privateKey]
-    }
-
+    },
+    polygonmumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_POLYGON_MUMBAI}`,
+      accounts: [privateKey]
+    },
   },
-  solidity: "0.8.9",    //tutorial uses: "0.8.4",
+  etherscan : {
+    apiKey: ETHERSCAN_API_KEY
+  },
+  solidity: "0.8.9",
 };

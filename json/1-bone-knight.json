@@ -1,0 +1,15 @@
+{
+  "description": "EtherFrens is a 1/1 collection of hand drawn frens that aim to unify the people of web3. Each one features a unique theme.", 
+  "image": "ipfs://QmSogt9CyRGD88F2kcy4NnqcaSLPmWeCnLHT97ar9LpPPY", 
+  "name": "EtherFrens #1",
+  "attributes": [
+      {
+          "trait_type": "Number", 
+          "value": "1"
+      },
+      {
+        "trait_type": "Kind", 
+        "value": "Bone Knight"
+      }
+    ]
+}

@@ -55,3 +55,7 @@ $ npx hardhat verify --network ethgoreli 0xBeB9aB39d45672aF96B634232141DFDf131cd
    for verification on the block explorer. Waiting for verification result...
 ```
 In this case there was a slight error but etherscan identified the contract fine. Goreli EtherScan for [EtherFrensContract](https://goerli.etherscan.io/address/0xbeb9ab39d45672af96b634232141dfdf131cde84#code)
+
+
+TODO:
+ - add lock

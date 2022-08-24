@@ -9,6 +9,7 @@ const privateKey = process.env.WALLET_PRIVATE_KEY;
 const POL = process.env.PROJECT_ID;
 const ALCHEMY_ID_ETH_MAINNET = process.env.ALCHEMY_ID_ETH_MAINNET;
 const ALCHEMY_ID_ETH_GORELI = process.env.ALCHEMY_ID_ETH_GORELI;
+const ALCHEMY_ID_ETH_RINKEBY = process.env.ALCHEMY_ID_ETH_RINKEBY;
 const ALCHEMY_POLYGON_MAINNET = process.env.ALCHEMY_POLYGON_MAINNET;
 const ALCHEMY_POLYGON_MUMBAI = process.env.ALCHEMY_POLYGON_MUMBAI;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
@@ -30,6 +31,10 @@ module.exports = {
     },
     ethgoreli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_ID_ETH_GORELI}`,
+      accounts: [privateKey]
+    },
+    ethrinkeby: {
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_ID_ETH_RINKEBY}`,
       accounts: [privateKey]
     },
     polygonmainnet: {

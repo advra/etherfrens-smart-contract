@@ -33,6 +33,7 @@ describe("EtherFrens Contract", function () {
       expect(await token721.name()).to.equal(_contractName);
       expect(await token721.symbol()).to.equal(_contractSymbol);
       expect(await token721.totalSupply()).to.equal(0);    
+      expect(token721._isSealed == false);    
     });
 
     it("Should set the right owner", async function () {
@@ -90,6 +91,18 @@ describe("EtherFrens Contract", function () {
       await expect(token721
         .connect(account1)
         .setTokenURI(1,TEST_URI2))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    // seal the URI
+    it("Testowner can call seal()", async function () {
+      expect(await token721.seal()).to.not.be.reverted;
+    });
+
+    it("Test guest should not call seal()", async function () {
+      await expect(token721
+        .connect(account1)
+        .seal())
         .to.be.revertedWith("Ownable: caller is not the owner");
     });
 
@@ -163,13 +176,22 @@ describe("EtherFrens Contract", function () {
       expect(await token721.tokenURI(2)).to.equal(TEST_URI2);
       expect(await token721.ownerOf(3)).to.equal(address1);
       expect(await token721.tokenURI(3)).to.equal(TEST_URI3);
-      expect(await token721.balanceOf(address1)).to.equal(3);      
+      expect(await token721.balanceOf(address1)).to.equal(3);     
       expect(await token721.totalSupply()).to.equal(3);  
       expect(await token721.totalSupply()).to.equal(3); 
     });
   });
 
   describe("URI Tests", function () {
+
+    it("Test setting tokenURI when sealed fails", async function () {
+      // no minting
+      token721.seal();
+      expect(token721._isSealed == true);
+      await expect(token721.setTokenURI(10, TEST_URI_NONTEXISTENT))
+        .to.be.revertedWith("URI is sealed");
+    });
+
     it("Test updating tokenURI of nonexistent token fails", async function () {
         // no minting
         await expect(token721.setTokenURI(10, TEST_URI_NONTEXISTENT))
@@ -237,7 +259,7 @@ describe("EtherFrens Contract", function () {
         expect(await token721.tokenURI(1)).to.equal(TEST_BASE1 + TEST_URI1);   
       });
 
-    it("Test updating baseURI updates existing minted tokens", async function () {
+    it("Test updating baseURI with tokenURIs should be Base+TokenURI", async function () {
         // update baseuri
         const address1=account1.address;
         token721.setBaseURI(TEST_BASE1);
@@ -260,6 +282,21 @@ describe("EtherFrens Contract", function () {
         expect(await token721.tokenURI(2)).to.equal(TEST_BASE2 + TEST_URI2);  
         expect(await token721.ownerOf(3)).to.equal(address1);
         expect(await token721.tokenURI(3)).to.equal(TEST_BASE2 + TEST_URI3); 
+        expect(await token721.totalSupply()).to.equal(3); 
+      });
+
+      it("Test updating baseURI with no tokenURIs set should be BaseURI+TokenIDs", async function () {
+        // update baseuri
+        // note: single mint cannot have empty URI while multimint can
+        const address1=account1.address;
+        token721.setBaseURI(TEST_BASE2);
+        await token721.mintMulti(address1, ["", "", ""]);
+        expect(await token721.ownerOf(1)).to.equal(address1);
+        expect(await token721.tokenURI(1)).to.equal(TEST_BASE2 + 1);   
+        expect(await token721.ownerOf(2)).to.equal(address1);
+        expect(await token721.tokenURI(2)).to.equal(TEST_BASE2 + 2);  
+        expect(await token721.ownerOf(3)).to.equal(address1);
+        expect(await token721.tokenURI(3)).to.equal(TEST_BASE2 + 3); 
         expect(await token721.totalSupply()).to.equal(3); 
       });
   });

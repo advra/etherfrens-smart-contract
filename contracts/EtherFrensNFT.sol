@@ -19,12 +19,16 @@ contract EtherFrensNFT is ERC721A, Ownable, ERC2981 {
         _isSealed = false;
     }
 
-    function mint(address _to, string memory newTokenURI) public onlyOwner {
+    function mint(string memory newTokenURI) public onlyOwner {
         require(!_isSealed, "URI is sealed");
         require(bytes(newTokenURI).length != 0);
-        if(_to == address(0)) {
-            _to = owner();
-        }
+        _safeMint(owner(), 1);
+        setTokenURI(_nextTokenId() - 1, newTokenURI);
+    }
+
+    function airdrop(address _to, string memory newTokenURI) public onlyOwner {
+        require(!_isSealed, "URI is sealed");
+        require(bytes(newTokenURI).length != 0);
         _safeMint(_to, 1);
         setTokenURI(_nextTokenId() - 1, newTokenURI);
     }

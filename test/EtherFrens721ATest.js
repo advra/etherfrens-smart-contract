@@ -42,22 +42,35 @@ describe("EtherFrens Contract", function () {
   });
 
   describe("Ownership Tests", function () {
+      // airdrop
+      it("Testowner can call mint()", async function () {
+        expect(await token721.mint(TEST_URI1)).to.not.be.reverted;
+        expect(await token721.ownerOf(1)).to.equal(owner.address);    
+      });
+  
+      it("Test guest should not call mint()", async function () {
+        await expect(token721
+          .connect(account1)
+          .mint(TEST_URI1))
+          .to.be.revertedWith("Ownable: caller is not the owner");
+      });
 
-    // mint
-    it("Testowner can call mint()", async function () {
-      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+    // airdrop
+    it("Testowner can call airdrop()", async function () {
+      expect(await token721.airdrop(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.ownerOf(1)).to.equal(account1.address);    
     });
 
-    it("Test guest should not call mint()", async function () {
+    it("Test guest should not call airdrop()", async function () {
       await expect(token721
         .connect(account1)
-        .mint(account1.address, TEST_URI1))
+        .airdrop(account1.address, TEST_URI1))
         .to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     // mintMulti
     it("Testowner can call mintMulti()", async function () {
-      expect(await token721.mintMulti(account1.address, [TEST_URI1, TEST_URI2, TEST_URI3])).to.not.be.reverted;
+      expect(await token721.mintMulti(account1.address, [TEST_URI1, TEST_URI2, TEST_URI3])).to.not.be.reverted;     
     });
 
     it("Test guest should not call mintMulti()", async function () {
@@ -81,13 +94,13 @@ describe("EtherFrens Contract", function () {
     // setTokenURI
     it("Testowner can call setTokenURI()", async function () {
       // must mint so we have valid URI to try to set
-      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.airdrop(account1.address, TEST_URI1)).to.not.be.reverted;
       expect(await token721.setTokenURI(1, TEST_URI2)).to.not.be.reverted;
     });
 
     it("Test guest should not call setTokenURI()", async function () {
       // must mint so we have valid URI to try to set
-      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.airdrop(account1.address, TEST_URI1)).to.not.be.reverted;
       await expect(token721
         .connect(account1)
         .setTokenURI(1,TEST_URI2))
@@ -122,12 +135,12 @@ describe("EtherFrens Contract", function () {
 
     // setTokenRoyalty
     it("Testowner can call setTokenRoyalty()", async function () {
-      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.airdrop(account1.address, TEST_URI1)).to.not.be.reverted;
       expect(await token721.setTokenRoyalty(1, owner.address, SIX_PERCENT_BIPS)).to.not.be.reverted;
     });
 
     it("Test guest should not call setTokenRoyalty()", async function () {
-      expect(await token721.mint(account1.address, TEST_URI1)).to.not.be.reverted;
+      expect(await token721.airdrop(account1.address, TEST_URI1)).to.not.be.reverted;
       await expect(token721
         .connect(account1)
         .setTokenRoyalty(1, owner.address, SIX_PERCENT_BIPS))
@@ -137,8 +150,15 @@ describe("EtherFrens Contract", function () {
 
   describe("Minting Tests", function () {
     it("Test owner can mint", async function () {
+      await token721.mint(TEST_URI1);
+      expect(await token721.ownerOf(1)).to.equal(owner.address);    
+      expect(await token721.tokenURI(1)).to.equal(TEST_URI1);
+      expect(await token721.totalSupply()).to.equal(1); 
+    });
+
+    it("Test owner can airdrop", async function () {
       const address1=account1.address;
-      await token721.mint(address1, TEST_URI1);
+      await token721.airdrop(address1, TEST_URI1);
       expect(await token721.ownerOf(1)).to.equal(address1);    
       expect(await token721.tokenURI(1)).to.equal(TEST_URI1);
       expect(await token721.totalSupply()).to.equal(1); 
@@ -147,17 +167,17 @@ describe("EtherFrens Contract", function () {
     // TODO: Passes but has gas estimation error issue
     // it("Test Non-owner should not mint", async function () {
     //   const address1=account1.address;
-    //   expect(await token721.connect(address1).mint(address1, TEST_URI1)).to.be.reverted();
+    //   expect(await token721.connect(address1).airdrop(address1, TEST_URI1)).to.be.reverted();
     //     // .is.revertedWith("Ownable: caller is not the owner");
     // });
 
     it("Test single mints 1,2 from owner to address1 results in 2 total", async function () {
       const address1=account1.address;
-      await token721.mint(address1, TEST_URI1);
+      await token721.airdrop(address1, TEST_URI1);
       expect(await token721.ownerOf(1)).to.equal(address1);
       expect(await token721.tokenURI(1)).to.equal(TEST_URI1);
 
-      await token721.mint(address1, TEST_URI2);
+      await token721.airdrop(address1, TEST_URI2);
       expect(await token721.ownerOf(2)).to.equal(address1);
       expect(await token721.tokenURI(2)).to.equal(TEST_URI2);
       expect(await token721.balanceOf(address1)).to.equal(2);   
@@ -202,9 +222,9 @@ describe("EtherFrens Contract", function () {
       const address1=account1.address;
 
       // mint 3 then change 3
-      await token721.mint(address1, TEST_URI1);
-      await token721.mint(address1, TEST_URI2);
-      await token721.mint(address1, TEST_URI3);
+      await token721.airdrop(address1, TEST_URI1);
+      await token721.airdrop(address1, TEST_URI2);
+      await token721.airdrop(address1, TEST_URI3);
       await expect(token721.setTokenURI(3, TEST_URI3))
         .to.not.be.reverted;
       
@@ -221,9 +241,9 @@ describe("EtherFrens Contract", function () {
       const address1=account1.address;
       
       // mint 3 then change 3
-      await token721.mint(address1, TEST_URI1);
-      await token721.mint(address1, TEST_URI2);
-      await token721.mint(address1, TEST_URI3);
+      await token721.airdrop(address1, TEST_URI1);
+      await token721.airdrop(address1, TEST_URI2);
+      await token721.airdrop(address1, TEST_URI3);
       await expect(token721.setTokenURI(3, TEST_URI3))
         .to.not.be.reverted;
       
@@ -237,9 +257,9 @@ describe("EtherFrens Contract", function () {
       const address1=account1.address;
       
       // mint 3 then change 3
-      await token721.mint(address1, TEST_URI1);
-      await token721.mint(address1, TEST_URI2);
-      await token721.mint(address1, TEST_URI3);
+      await token721.airdrop(address1, TEST_URI1);
+      await token721.airdrop(address1, TEST_URI2);
+      await token721.airdrop(address1, TEST_URI3);
       await expect(token721.setTokenURI(3, TEST_URI3))
         .to.not.be.reverted;
       
@@ -254,7 +274,7 @@ describe("EtherFrens Contract", function () {
         // update baseuri        
         const address1=account1.address;
         token721.setBaseURI(TEST_BASE1);
-        await token721.mint(address1, TEST_URI1);
+        await token721.airdrop(address1, TEST_URI1);
         expect(await token721.ownerOf(1)).to.equal(address1);
         expect(await token721.tokenURI(1)).to.equal(TEST_BASE1 + TEST_URI1);   
       });
@@ -263,9 +283,9 @@ describe("EtherFrens Contract", function () {
         // update baseuri
         const address1=account1.address;
         token721.setBaseURI(TEST_BASE1);
-        await token721.mint(address1, TEST_URI1);
-        await token721.mint(address1, TEST_URI2);
-        await token721.mint(address1, TEST_URI3);
+        await token721.airdrop(address1, TEST_URI1);
+        await token721.airdrop(address1, TEST_URI2);
+        await token721.airdrop(address1, TEST_URI3);
         expect(await token721.ownerOf(1)).to.equal(address1);
         expect(await token721.tokenURI(1)).to.equal(TEST_BASE1 + TEST_URI1);   
         expect(await token721.ownerOf(2)).to.equal(address1);
